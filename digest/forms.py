@@ -59,7 +59,7 @@ EMPTY_VALUES = (None, '')
 class HoneypotWidget(forms.TextInput):
     is_hidden = True
 
-    def __init__(self, attrs=None, html_comment=False, *args, **kwargs):
+    def __init__(self, attrs=None, html_comment=False):
         self.html_comment = html_comment
 
         super(HoneypotWidget, self).__init__(attrs)

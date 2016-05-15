@@ -375,7 +375,8 @@ class ItemClsCheck(models.Model):
                                          self.item.data4cls
                                      ]}))
                 self.score = resp.json()['links'][0].get(self.item.link, False)
-            except (requests.exceptions.RequestException, json.JSONDecodeError):
+            except (requests.exceptions.RequestException,
+                    json.JSONDecodeError):
                 self.score = False
             # print('Real run check: {}'.format(self.pk))
             self.save()

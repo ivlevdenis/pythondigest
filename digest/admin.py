@@ -52,10 +52,10 @@ def _save_item_model(request, item: Item, form, change) -> None:
 
 
 def _external_link(obj):
-    lnk = escape(obj.link)
-    ret = '<a target="_blank" href="{0}">Ссылка&nbsp;&gt;&gt;&gt;</a>'.format(lnk)
+    l = escape(obj.link)
     username = obj.user.username if obj.user else 'Гость'
-    ret = '{0}<br>Добавил: {1}'.format(ret, username)
+    ret = '<a target="_blank" href="{0}">Ссылка&nbsp;&gt;&gt;&gt;</a> ' \
+        '<br>Добавил: {1}'.format(l, username)
     return ret
 
 
@@ -73,13 +73,14 @@ class IssueAdmin(admin.ModelAdmin):
     issue_date.short_description = 'Период'
 
     def news_count(self, obj):
-        return str(Item.objects.filter(issue__pk=obj.pk, status='active').count())
+        ret = Item.objects.filter(issue__pk=obj.pk, status='active').count()
+        return str(ret)
 
     news_count.short_description = 'Количество новостей'
 
     def frontend_link(self, obj):
         lnk = reverse('digest:issue_view', kwargs={'pk': obj.pk})
-        return '<a target="_blank" href="{0}">{0}</a>'.format(lnk, lnk)
+        return '<a target="_blank" href="{0}">{0}</a>'.format(lnk)
 
     frontend_link.allow_tags = True
     frontend_link.short_description = 'Просмотр'
