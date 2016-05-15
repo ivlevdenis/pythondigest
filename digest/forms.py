@@ -10,12 +10,7 @@ from django.utils.encoding import force_text
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-try:
-    # Django >=1.7
-    from django.forms.utils import flatatt
-except ImportError:
-    # Django <1.7
-    from django.forms.util import flatatt
+from django.forms.utils import flatatt
 
 from digest.models import Item
 
@@ -67,7 +62,7 @@ class HoneypotWidget(forms.TextInput):
     def __init__(self, attrs=None, html_comment=False, *args, **kwargs):
         self.html_comment = html_comment
 
-        super(HoneypotWidget, self).__init__(attrs, *args, **kwargs)
+        super(HoneypotWidget, self).__init__(attrs)
 
         if 'class' not in self.attrs:
             self.attrs['style'] = 'display:none'
@@ -76,7 +71,7 @@ class HoneypotWidget(forms.TextInput):
         html = super(HoneypotWidget, self).render(*args, **kwargs)
 
         if self.html_comment:
-            html = '<!-- %s -->' % html
+            html = '<!-- {0} -->'.format(html)
 
         return html
 

@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import datetime
 import random
+from operator import itemgetter
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
@@ -48,16 +49,13 @@ class FavoriteItemsMixin(ContextMixin):
         if likes_enable():
             from secretballot.models import Vote
             date = datetime.datetime.now() - datetime.timedelta(days=12)
-            items = Item.objects.filter(
-                id__in=set(Vote.objects.filter(
-                    content_type=ContentType.objects.get(app_label='digest',
-                                                         model='item'),
-                ).values_list('object_id', flat=True)),
-                related_to_date__gt=date)
+            content_type = ContentType.objects.get(app_label='digest', model='item')
+            votes = Vote.objects.filter(content_type=content_type).values_list('object_id', flat=True)
+
+            items = Item.objects.filter(id__in=set(votes), related_to_date__gt=date)
             items_score = [(item, item.vote_total) for item in items if
                            item.vote_total > 0]
-            items_score = sorted(items_score, key=lambda item: item[1],
-                                 reverse=True)
+            items_score = sorted(items_score, key=itemgetter(1), reverse=True)
             context['favorite_items'] = [x[0] for x in items_score[:10]]
         return context
 

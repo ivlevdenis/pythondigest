@@ -21,7 +21,7 @@ admin.site.unregister(Site)
 
 def link_html(obj):
     link = escape(obj.link)
-    return '<a target="_blank" href="%s">%s</a>' % (link, link)
+    return '<a target="_blank" href="{0}">{0}</a>'.format(link)
 
 
 def _save_item_model(request, item: Item, form, change) -> None:
@@ -36,7 +36,7 @@ def _save_item_model(request, item: Item, form, change) -> None:
                 la = qs.filter(status='active').order_by('-pk')[0:1].get()
                 # последний неактивный
                 lna = qs.filter(pk__gt=la.pk).order_by('pk')[0:1].get()
-            except Issue.DoesNotExist as e:
+            except Issue.DoesNotExist:
                 logger.warning('Not found last or recent issue')
 
             if la or lna:
@@ -53,9 +53,9 @@ def _save_item_model(request, item: Item, form, change) -> None:
 
 def _external_link(obj):
     lnk = escape(obj.link)
-    ret = '<a target="_blank" href="%s">Ссылка&nbsp;&gt;&gt;&gt;</a>' % lnk
+    ret = '<a target="_blank" href="{0}">Ссылка&nbsp;&gt;&gt;&gt;</a>'.format(lnk)
     username = obj.user.username if obj.user else 'Гость'
-    ret = '%s<br>Добавил: %s' % (ret, username)
+    ret = '{0}<br>Добавил: {1}'.format(ret, username)
     return ret
 
 
@@ -68,19 +68,18 @@ class IssueAdmin(admin.ModelAdmin):
     actions = ['make_published']
 
     def issue_date(self, obj):
-        return 'С %s по %s' % (obj.date_from, obj.date_to)
+        return 'С {0} по {1}'.format(obj.date_from, obj.date_to)
 
     issue_date.short_description = 'Период'
 
     def news_count(self, obj):
-        return '%s' % Item.objects.filter(issue__pk=obj.pk,
-                                           status='active').count()
+        return str(Item.objects.filter(issue__pk=obj.pk, status='active').count())
 
     news_count.short_description = 'Количество новостей'
 
     def frontend_link(self, obj):
         lnk = reverse('digest:issue_view', kwargs={'pk': obj.pk})
-        return '<a target="_blank" href="%s">%s</a>' % (lnk, lnk)
+        return '<a target="_blank" href="{0}">{0}</a>'.format(lnk, lnk)
 
     frontend_link.allow_tags = True
     frontend_link.short_description = 'Просмотр'
@@ -89,13 +88,13 @@ class IssueAdmin(admin.ModelAdmin):
         from django_q.tasks import async
 
         if len(queryset) == 1:
-            issue = queryset[0]
+            issue = queryset.first()
             site = 'http://pythondigest.ru'
             async(
                 pub_to_all,
                 issue.announcement,
                 '{0}{1}'.format(site, issue.link),
-                '{0}{1}'.format(site, issue.image.url if issue.image else '')
+                '{0}{1}'.format(site, issue.image.url or '')
             )
 
     make_published.short_description = 'Опубликовать анонс в социальные сети'

@@ -5,10 +5,8 @@ import os
 
 import requests
 import requests.exceptions
-import simplejson.scanner
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save
@@ -78,7 +76,7 @@ def load_library_sections():
     try:
         LIBRARY_SECTIONS = [Section.objects.get(title=title) for title in
                             titles]
-    except (ObjectDoesNotExist, Section.DoesNotExist):
+    except Section.DoesNotExist:
         LIBRARY_SECTIONS = []
 
 
@@ -266,7 +264,7 @@ class Item(models.Model):
         try:
             item = ItemClsCheck.objects.get(item=self)
             item.check_cls()
-        except (ObjectDoesNotExist, ItemClsCheck.DoesNotExist):
+        except ItemClsCheck.DoesNotExist:
             item = ItemClsCheck(item=self)
             item.save()
             item.check_cls(force=True)
@@ -303,10 +301,7 @@ class Item(models.Model):
                                       ).summary()
                 except Unparseable:
                     result = text
-            except (KeyError,
-                    requests.exceptions.RequestException,
-                    requests.exceptions.Timeout,
-                    requests.exceptions.TooManyRedirects) as e:
+            except (KeyError, requests.exceptions.RequestException):
                 result = ''
             self.article_path = os.path.join(settings.DATASET_ROOT,
                                              '{0}.html'.format(self.id))
@@ -380,10 +375,7 @@ class ItemClsCheck(models.Model):
                                          self.item.data4cls
                                      ]}))
                 self.score = resp.json()['links'][0].get(self.item.link, False)
-            except (requests.exceptions.RequestException,
-                    requests.exceptions.Timeout,
-                    requests.exceptions.TooManyRedirects,
-                    simplejson.scanner.JSONDecodeError) as e:
+            except (requests.exceptions.RequestException, json.JSONDecodeError):
                 self.score = False
             # print('Real run check: {}'.format(self.pk))
             self.save()
@@ -504,7 +496,7 @@ def update_cls_score(instance, **kwargs):
         item = ItemClsCheck.objects.get(item=instance)
         async(item.check_cls, False)
         item.check_cls()
-    except (ObjectDoesNotExist, ItemClsCheck.DoesNotExist):
+    except ItemClsCheck.DoesNotExist:
         item = ItemClsCheck(item=instance)
         item.save()
         async(item.check_cls, True)
@@ -512,5 +504,4 @@ def update_cls_score(instance, **kwargs):
 
 if likes_enable():
     import secretballot
-
     secretballot.enable_voting_on(Item)
