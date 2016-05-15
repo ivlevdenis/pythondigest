@@ -16,11 +16,11 @@ def _generate_release_item(package_version: str, link: str,
                            resource: Resource, section: Section,
                            package_data: dict):
     name = '{0} - {1}'.format(package_data.get('name'), package_version)
-    description = '{2}.' \
-                  ' Изменения описаны по ссылке <a href="{3}">{3}</a>. ' \
-                  'Скачать можно по ссылке: <a href="{4}">{4}</a>'.format(
-                      package_data.get('name'),
-                      package_version,
+    description = '{0}.' \
+                  ' Изменения описаны по ссылке <a href="{1}">{1}</a>. ' \
+                  'Скачать можно по ссылке: <a href="{2}">{2}</a>'.format(
+                      # package_data.get('name'),
+                      # package_version,
                       package_data.get('description'),
                       link,
                       package_data.get('url')

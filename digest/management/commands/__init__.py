@@ -46,7 +46,7 @@ def _clojure_get_youtube_urls_from_page():
         Применяется для раздела Видео
     :return:
     """
-    reg_list = '((https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/(watch\?.*?(?=v=)v=|embed/|v/|.+\?v=)?([^&=%\?]{11}))'
+    reg_list = r'((https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/(watch\?.*?(?=v=)v=|embed/|v/|.+\?v=)?([^&=%\?]{11}))'
 
     youtube_links = ['youtu.be', 'youtube.com', 'youtube-nocookie.com']
 

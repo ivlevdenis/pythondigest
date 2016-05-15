@@ -9,7 +9,7 @@ from urllib.request import urlopen
 
 import feedparser
 from django.core.management.base import BaseCommand
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from digest.management.commands import (
     apply_parsing_rules,
@@ -71,7 +71,7 @@ def import_tweets(**kwargs):
         save_item(item_data)
 
 
-def get_items_from_rss(rss_link: str) -> List[Dict]:
+def get_items_from_rss(rss_link: str) -> List:
     """
     Get rss content from rss source.
 

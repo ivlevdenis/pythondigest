@@ -16,8 +16,7 @@ def check_exist_link(data, item):
     for info in data.get('links'):
         if info['link'] == item.link:
             return True
-    else:
-        return False
+    return False
 
 
 def create_dataset(queryset_items, name):
